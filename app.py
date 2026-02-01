@@ -1,21 +1,34 @@
 import streamlit as st
 import pickle
 
-model = pickle.load(open("model.pkl","rb"))
-vectorizer = pickle.load(open("vectorizer.pkl","rb"))
+# Load model and vectorizer
+with open("model.pkl", "rb") as f:
+    model = pickle.load(f)
 
-st.title("📧Email Spam Detection")
+with open("vectorizer.pkl", "rb") as f:
+    vectorizer = pickle.load(f)
 
-text = st.text_area("Email Content",height=200)
 
+# App title
+st.title("📧 Email Spam Detection")
+st.write("Enter an email message below to check whether it is **Spam** or **Not Spam**.")
+
+# Text input
+email = st.text_area("✉️ Email Content", height=200)
+
+# Predict button
 if st.button("Check Spam"):
-    if not text.strip():
-        st.warning("please enter email")
+    if email.strip() == "":
+        st.warning("Please enter email text")
     else:
-        vec = vectorizer.transform([text])
-        pred = model.predict(vec)[0]
-        if pred == 1:
-            st.error("☠️ SPAM")
-        else:
-            st.success("👍 NOT SPAM")
+        # Transform text
+        text_vector = vectorizer.transform([email])
 
+        # Prediction
+        prediction = model.predict(text_vector)[0]
+
+        # Output
+        if prediction == 1:
+            st.error("This email is **SPAM**")
+        else:
+            st.success("This email is **NOT SPAM**")
